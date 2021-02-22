@@ -212,9 +212,8 @@ async def wiki(wiki_q):
         return await wiki_q.edit(f"Page not found.\n\n{pageerror}")
     result = summary(match)
     if len(result) >= 4096:
-        file = open("output.txt", "w+")
-        file.write(result)
-        file.close()
+        with open("output.txt", "w+") as file:
+            file.write(result)
         await wiki_q.client.send_file(
             wiki_q.chat_id,
             "output.txt",
@@ -245,17 +244,16 @@ async def urban_dict(ud_e):
     if int(meanlen) >= 0:
         if int(meanlen) >= 4096:
             await ud_e.edit("`Output too large, sending as file.`")
-            file = open("output.txt", "w+")
-            file.write(
-                "Text: "
-                + query
-                + "\n\nMeaning: "
-                + mean[0]["def"]
-                + "\n\n"
-                + "Example: \n"
-                + mean[0]["example"]
-            )
-            file.close()
+            with open("output.txt", "w+") as file:
+                file.write(
+                    "Text: "
+                    + query
+                    + "\n\nMeaning: "
+                    + mean[0]["def"]
+                    + "\n\n"
+                    + "Example: \n"
+                    + mean[0]["example"]
+                )
             await ud_e.client.send_file(
                 ud_e.chat_id,
                 "output.txt",
@@ -356,16 +354,12 @@ async def imdb(e):
             stars = "Not available"
         elif len(credits) > 2:
             writer = credits[1].a.text
-            actors = []
-            for x in credits[2].findAll("a"):
-                actors.append(x.text)
+            actors = [x.text for x in credits[2].findAll("a")]
             actors.pop()
             stars = actors[0] + "," + actors[1] + "," + actors[2]
         else:
             writer = "Not available"
-            actors = []
-            for x in credits[1].findAll("a"):
-                actors.append(x.text)
+            actors = [x.text for x in credits[1].findAll("a")]
             actors.pop()
             stars = actors[0] + "," + actors[1] + "," + actors[2]
         if soup.find("div", "inline canwrap"):
@@ -453,24 +447,22 @@ async def lang(value):
         scraper = "Translator"
         global TRT_LANG
         arg = value.pattern_match.group(2).lower()
-        if arg in LANGUAGES:
-            TRT_LANG = arg
-            LANG = LANGUAGES[arg]
-        else:
+        if arg not in LANGUAGES:
             return await value.edit(
                 f"`Invalid Language code !!`\n`Available language codes for TRT`:\n\n`{LANGUAGES}`"
             )
+        TRT_LANG = arg
+        LANG = LANGUAGES[arg]
     elif util == "tts":
         scraper = "Text to Speech"
         global TTS_LANG
         arg = value.pattern_match.group(2).lower()
-        if arg in tts_langs():
-            TTS_LANG = arg
-            LANG = tts_langs()[arg]
-        else:
+        if arg not in tts_langs():
             return await value.edit(
                 f"`Invalid Language code !!`\n`Available language codes for TTS`:\n\n`{tts_langs()}`"
             )
+        TTS_LANG = arg
+        LANG = tts_langs()[arg]
     await value.edit(f"`Language for {scraper} changed to {LANG.title()}.`")
     if BOTLOG:
         await value.client.send_message(

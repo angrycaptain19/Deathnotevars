@@ -17,11 +17,9 @@ async def hep(event):
         if args in CMD_HELP:
             await event.edit(str(CMD_HELP[args]))
             await asyncio.sleep(15)
-            await event.delete()
         else:
             await event.edit("Please specify a valid module name.")
             await asyncio.sleep(5)
-            await event.delete()
     else:
         string1 = "Please specify which module do you want help for !!\nUsage: .help <module name>\n\n"
         string = "• "
@@ -34,4 +32,5 @@ async def hep(event):
             f"{string1}" f"{string3}" f"{string2}\n" f"{string}" f"{string2}"
         )
         await asyncio.sleep(20)
-        await event.delete()
+
+    await event.delete()
