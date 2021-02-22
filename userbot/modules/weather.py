@@ -18,7 +18,7 @@ from userbot import WEATHER_DEFCITY
 from userbot.events import register
 
 # ===== CONSTANT =====
-DEFCITY = WEATHER_DEFCITY if WEATHER_DEFCITY else None
+DEFCITY = WEATHER_DEFCITY or None
 # ====================
 
 

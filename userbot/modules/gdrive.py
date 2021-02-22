@@ -84,17 +84,12 @@ if __ is not None:
                     G_DRIVE_FOLDER_ID = __.split("folderview?id=")[1]
                 except IndexError:
                     if "http://" not in __ or "https://" not in __:
-                        if any(map(str.isdigit, __)):
-                            _1 = True
-                        else:
-                            _1 = False
+                        _1 = any(map(str.isdigit, __))
                         if "-" in __ or "_" in __:
                             _2 = True
                         else:
                             _2 = False
-                        if True in [_1 or _2]:
-                            pass
-                        else:
+                        if True not in [_1 or _2]:
                             LOGS.info("G_DRIVE_FOLDER_ID " "not a valid ID...")
                             G_DRIVE_FOLDER_ID = None
                     else:
@@ -252,9 +247,11 @@ async def download(gdrive, service, uri=None):
                 ),
             )
         except CancelProcess:
-            names = []
-            for name in os.listdir(TEMP_DOWNLOAD_DIRECTORY):
-                names.append(join(TEMP_DOWNLOAD_DIRECTORY, name))
+            names = [
+                join(TEMP_DOWNLOAD_DIRECTORY, name)
+                for name in os.listdir(TEMP_DOWNLOAD_DIRECTORY)
+            ]
+
             newest = max(names, key=getctime)
             os.remove(newest)
             reply += (
@@ -569,8 +566,7 @@ async def create_dir(service, folder_name):
         "mimeType": "application/vnd.google-apps.folder",
     }
     try:
-        if parent_Id is not None:
-            pass
+        pass
     except NameError:
         if G_DRIVE_FOLDER_ID is not None:
             metadata["parents"] = [G_DRIVE_FOLDER_ID]
@@ -596,8 +592,7 @@ async def upload(gdrive, service, file_path, file_name, mimeType):
         "mimeType": mimeType,
     }
     try:
-        if parent_Id is not None:
-            pass
+        pass
     except NameError:
         if G_DRIVE_FOLDER_ID is not None:
             body["parents"] = [G_DRIVE_FOLDER_ID]
@@ -681,8 +676,7 @@ async def task_directory(gdrive, service, folder_path):
 async def reset_parentId():
     global parent_Id
     try:
-        if parent_Id is not None:
-            pass
+        pass
     except NameError:
         if G_DRIVE_FOLDER_ID is not None:
             parent_Id = G_DRIVE_FOLDER_ID
@@ -807,8 +801,7 @@ async def google_drive_managers(gdrive):
             "mimeType": "application/vnd.google-apps.folder",
         }
         try:
-            if parent_Id is not None:
-                pass
+            pass
         except NameError:
             if G_DRIVE_FOLDER_ID is not None:
                 metadata["parents"] = [G_DRIVE_FOLDER_ID]
@@ -1012,18 +1005,17 @@ async def google_drive(gdrive):
                         f"`Reason` : {str(e)}\n\n"
                     )
                     continue
-            if reply:
-                await gdrive.respond(reply, link_preview=False)
-                await gdrive.delete()
-                return True
-            else:
+            if not reply:
                 return None
+            await gdrive.respond(reply, link_preview=False)
+            await gdrive.delete()
+            return True
         elif re.findall(r"\bhttps?://.*\.\S+", value) or "magnet:?" in value:
             uri = value.split()
         else:
             for fileId in value.split():
-                one = True if any(map(str.isdigit, fileId)) else False
-                two = True if "-" in fileId or "_" in fileId else False
+                one = any(map(str.isdigit, fileId))
+                two = "-" in fileId or "_" in fileId
                 if True in [one or two]:
                     try:
                         reply += await download_gdrive(gdrive, service, fileId)
@@ -1040,12 +1032,11 @@ async def google_drive(gdrive):
                             f"`Reason` : {str(e)}\n\n"
                         )
                         continue
-            if reply:
-                await gdrive.respond(reply, link_preview=False)
-                await gdrive.delete()
-                return True
-            else:
+            if not reply:
                 return None
+            await gdrive.respond(reply, link_preview=False)
+            await gdrive.delete()
+            return True
         if not uri and not gdrive.reply_to_msg_id:
             await gdrive.edit(
                 "`[VALUE - ERROR]`\n\n"
@@ -1134,8 +1125,8 @@ async def set_upload_folder(gdrive):
     try:
         ext_id = re.findall(r"\bhttps?://drive\.google\.com\S+", inp)[0]
     except IndexError:
-        c1 = True if any(map(str.isdigit, inp)) else False
-        c2 = True if "-" in inp or "_" in inp else False
+        c1 = any(map(str.isdigit, inp))
+        c2 = "-" in inp or "_" in inp
         if True in [c1 or c2]:
             parent_Id = inp
             await gdrive.edit(

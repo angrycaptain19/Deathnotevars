@@ -41,12 +41,13 @@ async def telegraphs(grop):
     elif type_of_group in ["g", "c"]:
         try:
             r = await grop.client(
-                functions.channels.CreateChannelRequest(  # pylint:disable=E0602
+                functions.channels.CreateChannelRequest(
                     title=group_name,
                     about="Welcome to this Channel",
-                    megagroup=False if type_of_group == "c" else True,
+                    megagroup=type_of_group != "c",
                 )
             )
+
             created_chat_id = r.chats[0].id
             result = await grop.client(
                 functions.messages.ExportChatInviteRequest(

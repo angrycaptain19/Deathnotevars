@@ -56,7 +56,7 @@ async def welcome_to_chat(event):
             else:
                 time = "Selamat malam 🌕"
 
-            title = chat.title if chat.title else "this chat"
+            title = chat.title or "this chat"
             participants = await event.client.get_participants(chat)
             count = len(participants)
             mention = "[{}](tg://user?id={})".format(a_user.first_name, a_user.id)
